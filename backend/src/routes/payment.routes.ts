@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { pool } from "../config/db.js";
 import { z } from "zod";
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, timingSafeEqual, randomUUID } from "node:crypto";
 import express from "express";
 const router = Router();
 
@@ -13,13 +13,21 @@ const paymentWebhookSchema = z.object({
 });
 // LOCAL ASSIGNMENT SIMULATION ONLY.
 // A production webhook must verify the payment provider's signature.
-router.post("/webhook", async (req, res) => {
+const handlePaymentWebhook = async (
+    req: express.Request & { rawBody?: Buffer },
+    res: express.Response,
+) => {
 
     const rawBody = (
         req as express.Request & { rawBody?: Buffer }
     ).rawBody;
 
-    const signature = req.header("X-Signature");
+   const simulatedSignature = (
+    req as express.Request & { simulatedSignature?: string }
+).simulatedSignature;
+
+const signature =
+    simulatedSignature ?? req.header("X-Signature");
     const secret = process.env.WEBHOOK_SECRET;
 
     if (!rawBody || !signature || !secret) {
@@ -297,6 +305,91 @@ router.post("/webhook", async (req, res) => {
         });
     } finally {
         client.release();
+    }
+};
+
+router.post("/webhook", handlePaymentWebhook);
+
+router.post("/simulate/:orderId", async (req, res) => {
+    // Never allow simulated payments in production.
+    if (process.env.NODE_ENV === "production") {
+        res.status(404).json({
+            message: "Payment simulation is unavailable.",
+        });
+        return;
+    }
+
+    const params = z.object({
+        orderId: z.string().uuid(),
+    }).safeParse(req.params);
+
+    if (!params.success) {
+        res.status(400).json({ message: "Invalid order ID." });
+        return;
+    }
+
+    const secret = process.env.WEBHOOK_SECRET;
+
+    if (!secret) {
+        res.status(500).json({
+            message: "WEBHOOK_SECRET is not configured.",
+        });
+        return;
+    }
+
+    try {
+        const result = await pool.query<{
+            total_paise: number | string;
+        }>(
+            `SELECT total_paise FROM orders WHERE id = $1`,
+            [params.data.orderId],
+        );
+
+        if (result.rows.length === 0) {
+            res.status(404).json({ message: "Order not found." });
+            return;
+        }
+
+        const amountPaise = Number(result.rows[0]!.total_paise);
+
+        if (!Number.isSafeInteger(amountPaise) || amountPaise <= 0) {
+            res.status(400).json({
+                message: "Order amount is invalid for payment simulation.",
+            });
+            return;
+        }
+
+        const payload = {
+            eventId: randomUUID(),
+            orderId: params.data.orderId,
+            amountPaise,
+            status: "captured" as const,
+        };
+
+        const rawBody = Buffer.from(JSON.stringify(payload));
+        const signature = createHmac("sha256", secret)
+            .update(rawBody)
+            .digest("hex");
+
+        // Pass the signed simulation through the existing webhook logic.
+      const simulatedReq = Object.create(req) as express.Request & {
+    rawBody?: Buffer;
+    simulatedSignature?: string;
+};
+   simulatedReq.body = payload;
+simulatedReq.rawBody = rawBody;
+simulatedReq.simulatedSignature = signature;
+
+
+        await handlePaymentWebhook(simulatedReq, res);
+    } catch (error) {
+        console.error("Payment simulation failed:", error);
+
+        if (!res.headersSent) {
+            res.status(500).json({
+                message: "Could not simulate payment.",
+            });
+        }
     }
 });
 
