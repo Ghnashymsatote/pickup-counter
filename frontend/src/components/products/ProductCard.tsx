@@ -1,3 +1,4 @@
+import { useState } from "react";
 
 import { useCart } from "../../feature/cart/useCart";
 import { formatPrice } from "../../feature/cart/CartUtil";
@@ -10,6 +11,10 @@ type ProductCardProps = {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { items, addItem, updateQuantity } = useCart();
+
+  // A missing or broken file must not leave an empty box: fall back to the
+  // initial-letter placeholder instead.
+  const [imageFailed, setImageFailed] = useState(false);
 
   const cartItem = items.find(
     (item) => item.product.id === product.id,
@@ -32,9 +37,20 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <article className="product-card">
       <div className="product-visual">
-        <span className="product-initial">
-          {product.name.charAt(0)}
-        </span>
+        {product.imageUrl && !imageFailed ? (
+          <img
+            className="product-image"
+            src={product.imageUrl}
+            alt={product.name}
+            loading="lazy"
+            decoding="async"
+            onError={() => setImageFailed(true)}
+          />
+        ) : (
+          <span className="product-initial">
+            {product.name.charAt(0)}
+          </span>
+        )}
       </div>
 
       <div className="product-details">

@@ -8,3 +8,22 @@ VALUES
     ('Fruit Juice', 4000, 6),
     ('Sandwich', 6000, 5)
 ON CONFLICT (name) DO NOTHING;
+
+-- Image locations, applied separately so re-running only refreshes the paths
+-- and never resets stock.
+UPDATE products
+SET image_url = CASE name
+    WHEN 'Potato Chips' THEN '/images/potato-chips.jpg'
+    WHEN 'Chocolate Bar' THEN '/images/chocolate-bar.jpg'
+    WHEN 'Cookies' THEN '/images/cookies.jpg'
+    WHEN 'Fruit Juice' THEN '/images/fruit-juice.jpg'
+    WHEN 'Sandwich' THEN '/images/sandwich.jpg'
+    ELSE image_url
+END
+WHERE name IN (
+    'Potato Chips',
+    'Chocolate Bar',
+    'Cookies',
+    'Fruit Juice',
+    'Sandwich'
+);

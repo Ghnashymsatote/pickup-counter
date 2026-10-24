@@ -285,6 +285,12 @@ credential — right now any caller who knows an order id can claim it.
   situation as far as every query is concerned.
 - **CORS is open** (`CORS_ORIGIN=*`) for local review convenience. A real
   deployment would name the screen's origin.
+- **Product images are static files, not uploads.** `products.image_url` holds
+  a path served by the frontend (`/images/cookies.jpg`), seeded alongside the
+  five products. The column is nullable and a missing or broken file falls
+  back to the initial-letter placeholder, so the screen never shows an empty
+  box. A real counter would want an upload path and a CDN; that is well
+  outside this brief.
 
 ---
 

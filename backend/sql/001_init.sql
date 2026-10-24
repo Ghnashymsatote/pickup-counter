@@ -14,8 +14,15 @@ CREATE TABLE IF NOT EXISTS products (
     -- whatever the application does.
     stock INTEGER NOT NULL CHECK (stock >= 0),
     active BOOLEAN NOT NULL DEFAULT TRUE,
+    -- Path served by the frontend (e.g. /images/cookies.jpg), or NULL for
+    -- products that fall back to the initial-letter placeholder.
+    image_url TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- For databases created before image_url existed. CREATE TABLE IF NOT EXISTS
+-- above is a no-op for them, so the column has to be added separately.
+ALTER TABLE products ADD COLUMN IF NOT EXISTS image_url TEXT;
 
 CREATE TABLE IF NOT EXISTS orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
