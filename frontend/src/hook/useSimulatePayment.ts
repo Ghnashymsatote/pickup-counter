@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { simulatePayment } from "../services/paymentService";
 
@@ -7,14 +6,13 @@ export function useSimulatePayment(orderId: string) {
 
   return useMutation({
     mutationFn: () => simulatePayment(orderId),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["order", orderId],
-      });
-
-      await queryClient.invalidateQueries({
-        queryKey: ["products"],
-      });
+    // onSettled, not onSuccess: a failed capture also changes the order
+    // (it may now be needs_review), so the screen must re-read it either way.
+    onSettled: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["order", orderId] }),
+        queryClient.invalidateQueries({ queryKey: ["products"] }),
+      ]);
     },
   });
 }

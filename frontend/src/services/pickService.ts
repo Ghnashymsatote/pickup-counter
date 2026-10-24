@@ -1,15 +1,18 @@
+import { apiFetch } from "../lib/api";
 
-const API_URL = "http://localhost:5001";
+export type ClaimResponse = {
+  success: true;
+  orderId: string;
+  status: "claimed";
+  claimedAt: string;
+  message: string;
+};
 
-export async function claimPickup(orderId: string): Promise<void> {
-  const response = await fetch(
-    `${API_URL}/orders/${orderId}/pickup-claim`,
+export async function claimPickup(
+  orderId: string,
+): Promise<ClaimResponse> {
+  return apiFetch<ClaimResponse>(
+    `/orders/${encodeURIComponent(orderId)}/pickup-claim`,
     { method: "POST" },
   );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message ?? "Could not claim pickup.");
-  }
 }

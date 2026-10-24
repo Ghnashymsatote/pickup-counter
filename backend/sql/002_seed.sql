@@ -1,4 +1,5 @@
-
+-- Five seed products. ON CONFLICT keeps re-running this file harmless and
+-- means a restart never resets stock that the counter has already sold.
 INSERT INTO products (name, price_paise, stock)
 VALUES
     ('Potato Chips', 2000, 10),

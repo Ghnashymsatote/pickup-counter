@@ -1,5 +1,5 @@
-
-const API_URL = "http://localhost:5001";
+import { apiFetch } from "../lib/api";
+import type { Order } from "../types/order";
 
 export type CreateOrderRequest = {
   items: {
@@ -8,32 +8,13 @@ export type CreateOrderRequest = {
   }[];
 };
 
-export type CreatedOrder = {
-  id: string;
-  status: string;
-  totalPaise: number;
-  createdAt: string;
-  expiresAt: string;
-  expiresInSeconds: number;
-  items: unknown[];
-};
-
 export async function createOrder(
   request: CreateOrderRequest,
-): Promise<CreatedOrder> {
-  const response = await fetch(`${API_URL}/orders`, {
+): Promise<Order> {
+  const data = await apiFetch<{ order: Order }>("/orders", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(request),
   });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message ?? "Could not create order.");
-  }
-
-  return data.order ?? data;
+  return data.order;
 }

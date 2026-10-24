@@ -1,21 +1,21 @@
+import { apiFetch } from "../lib/api";
 
-const API_URL = "http://localhost:5001";
+export type PaymentResult = {
+  received: true;
+  duplicate: boolean;
+  outcome: string;
+  orderStatus: string;
+};
 
+/**
+ * Stands in for the UPI app. The backend signs a capture event for this
+ * order's exact total and puts it through the real webhook path.
+ */
 export async function simulatePayment(
   orderId: string,
-): Promise<void> {
-  const response = await fetch(
-    `${API_URL}/payments/simulate/${encodeURIComponent(orderId)}`,
-    {
-      method: "POST",
-    },
+): Promise<PaymentResult> {
+  return apiFetch<PaymentResult>(
+    `/payments/simulate/${encodeURIComponent(orderId)}`,
+    { method: "POST" },
   );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.message ?? "Could not simulate payment.",
-    );
-  }
 }

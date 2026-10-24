@@ -33,3 +33,66 @@ a {
 #root {
   min-height: 100vh;
 }
+
+/* --- Order status screen ------------------------------------------------ */
+
+.countdown {
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin: 0.25rem 0;
+}
+
+.countdown.expired {
+  color: #b42318;
+  font-size: 1.5rem;
+}
+
+.muted {
+  color: #667085;
+}
+
+.muted.small {
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #eaecf0;
+  color: #344054;
+}
+
+.status-pill.status-paid {
+  background: #d1fadf;
+  color: #05603a;
+}
+
+.status-pill.status-claimed {
+  background: #d1e9ff;
+  color: #175cd3;
+}
+
+.status-pill.status-expired {
+  background: #fee4e2;
+  color: #b42318;
+}
+
+.status-pill.status-needs_review {
+  background: #fef0c7;
+  color: #b54708;
+}
+
+.message.error-message {
+  background: #fee4e2;
+  border: 1px solid #fda29b;
+  color: #b42318;
+  border-radius: 8px;
+  padding: 0.75rem;
+}
