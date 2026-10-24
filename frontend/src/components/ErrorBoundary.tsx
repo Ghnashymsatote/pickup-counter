@@ -23,7 +23,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
     return (
       <main className="store-page">
-        <section className="welcome-section">
+        <section className="empty-state">
           <h2>Something went wrong on this screen</h2>
 
           <p>
@@ -31,7 +31,11 @@ export class ErrorBoundary extends Component<Props, State> {
             problem. Reload to continue, or ask at the counter.
           </p>
 
-          <button type="button" onClick={() => window.location.reload()}>
+          <button
+            type="button"
+            className="add-to-cart-button"
+            onClick={() => window.location.reload()}
+          >
             Reload
           </button>
         </section>

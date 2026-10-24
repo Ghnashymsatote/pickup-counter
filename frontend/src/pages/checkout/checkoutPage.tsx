@@ -31,19 +31,22 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <main className="store-page">
-        <section className="welcome-section">
+      <div className="store-page narrow">
+        <section className="empty-state">
           <h2>Your cart is empty</h2>
           <p>Pick a few snacks before checking out.</p>
-          <Link to="/">Back to the store</Link>
+          <Link to="/" className="add-to-cart-button">
+            Back to the store
+          </Link>
         </section>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="store-page">
+    <div className="store-page narrow">
       <section className="welcome-section">
+        <p className="eyebrow">Step 1 of 2</p>
         <h2>Checkout</h2>
         <p>
           Placing the order holds your items for 120 seconds while you pay.
@@ -95,6 +98,6 @@ export default function CheckoutPage() {
 
         <Link to="/">Keep shopping</Link>
       </section>
-    </main>
+    </div>
   );
 }

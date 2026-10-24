@@ -8,5 +8,10 @@ export default defineConfig({
         testTimeout: 30_000,
         hookTimeout: 30_000,
         globalSetup: ["./tests/globalSetup.ts"],
+        // Child processes rather than worker threads. The thread pool fails
+        // to allocate on some Windows/Node 24 combinations ("memory
+        // allocation of N bytes failed") before a single test runs, and
+        // these tests are I/O-bound on Postgres, so forks cost nothing.
+        pool: "forks",
     },
 });

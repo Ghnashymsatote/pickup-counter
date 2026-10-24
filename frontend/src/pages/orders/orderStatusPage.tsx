@@ -125,18 +125,18 @@ export default function OrderStatusPage() {
 
   if (isPending) {
     return (
-      <main className="store-page">
+      <div className="store-page narrow">
         <p className="message" role="status">
           Loading your order...
         </p>
-      </main>
+      </div>
     );
   }
 
   if (isError || !order) {
     return (
-      <main className="store-page">
-        <section className="welcome-section">
+      <div className="store-page narrow">
+        <section className="empty-state">
           <h2>We could not load this order</h2>
 
           <p>
@@ -145,7 +145,11 @@ export default function OrderStatusPage() {
               : "This order could not be found."}
           </p>
 
-          <button type="button" onClick={() => void refetch()}>
+          <button
+            type="button"
+            className="add-to-cart-button"
+            onClick={() => void refetch()}
+          >
             Try again
           </button>
 
@@ -153,16 +157,16 @@ export default function OrderStatusPage() {
             <Link to="/">Back to the store</Link>
           </p>
         </section>
-      </main>
+      </div>
     );
   }
 
   const message = STATUS_MESSAGE[order.status];
 
   return (
-    <main className="store-page">
+    <div className="store-page narrow">
       <section className="welcome-section">
-        <p className="eyebrow">ORDER {order.id.slice(0, 8).toUpperCase()}</p>
+        <p className="eyebrow">Order {order.id.slice(0, 8).toUpperCase()}</p>
         <h2>{message.title}</h2>
         <p>{message.body}</p>
         <p className={`status-pill status-${order.status}`}>
@@ -196,6 +200,6 @@ export default function OrderStatusPage() {
       <p>
         <Link to="/">Back to the store</Link>
       </p>
-    </main>
+    </div>
   );
 }

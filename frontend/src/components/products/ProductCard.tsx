@@ -22,6 +22,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const quantity = cartItem?.quantity ?? 0;
   const isAvailable = product.availableStock > 0;
+  const heldByOthers = Math.max(product.stock - product.availableStock, 0);
   const canAddMore = quantity < product.availableStock;
 
   function handleAddToCart() {
@@ -73,9 +74,11 @@ export default function ProductCard({ product }: ProductCardProps) {
               : "Out of stock"}
           </span>
 
-          <span className="stock-label">
-            {isAvailable ? "In stock" : "Unavailable"}
-          </span>
+          {heldByOthers > 0 && (
+            <span className="stock-label">
+              {heldByOthers} held by others
+            </span>
+          )}
         </div>
 
         {quantity === 0 ? (
